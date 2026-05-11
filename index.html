@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-Portafolio · Creamos nuestro propio cuento digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ══════════════════════════════════════════
+       VARIABLES Y RESET
+    ══════════════════════════════════════════ */
+    :root {
+      --ink:        #1c2b3a;
+      --cream:      #f5f0e8;
+      --cream-dark: #ede6d6;
+      --green:      #2a5c45;
+      --green-lt:   #3d7a5f;
+      --gold:       #b8821a;
+      --gold-lt:    #e8a82a;
+      --sage:       #8aab95;
+      --mist:       #dce8e1;
+      --red-soft:   #c0392b;
+      --border:     #c8bfa8;
+      --shadow:     rgba(28,43,58,.12);
+
+      --font-head: 'Playfair Display', Georgia, serif;
+      --font-body: 'Lora', Georgia, serif;
+      --font-ui:   'Nunito', sans-serif;
+
+      --nav-h: 64px;
+      --max-w: 960px;
+      --radius: 10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--cream);
+      color: var(--ink);
+      line-height: 1.75;
+      min-height: 100vh;
+    }
+
+    /* Grain texture overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ══════════════════════════════════════════
+       NAVEGACIÓN FIJA
+    ══════════════════════════════════════════ */
+    nav#navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: var(--ink);
+      display: flex; align-items: center;
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(0,0,0,.25);
+    }
+
+    .nav-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .nav-brand {
+      font-family: var(--font-head);
+      color: var(--gold-lt);
+      font-size: .95rem;
+      font-style: italic;
+      white-space: nowrap;
+      flex-shrink: 0;
+      letter-spacing: .02em;
+    }
+
+    .nav-sep { width: 1px; height: 28px; background: rgba(255,255,255,.18); flex-shrink: 0; }
+
+    .nav-links {
+      display: flex;
+      gap: .15rem;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .nav-links a {
+      font-family: var(--font-ui);
+      font-size: .72rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.65);
+      text-decoration: none;
+      white-space: nowrap;
+      padding: .3rem .6rem;
+      border-radius: 4px;
+      transition: background .2s, color .2s;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .nav-links a:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .nav-links a.active { background: var(--green); color: #fff; }
+
+    /* hamburger */
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: .4rem;
+      margin-left: auto;
+    }
+    .nav-toggle span {
+      display: block; width: 22px; height: 2px;
+      background: #fff; border-radius: 2px;
+      transition: transform .3s, opacity .3s;
+    }
+
+    /* Mobile nav drawer */
+    .nav-drawer {
+      display: none;
+      position: fixed;
+      top: var(--nav-h); left: 0; right: 0;
+      background: var(--ink);
+      padding: 1rem 1.5rem 1.5rem;
+      z-index: 999;
+      flex-direction: column;
+      gap: .4rem;
+      border-top: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 8px 24px rgba(0,0,0,.3);
+    }
+    .nav-drawer.open { display: flex; }
+    .nav-drawer a {
+      font-family: var(--font-ui);
+      font-size: .82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.7);
+      text-decoration: none;
+      padding: .55rem .8rem;
+      border-radius: 6px;
+      transition: background .2s, color .2s;
+      letter-spacing: .03em;
+    }
+    .nav-drawer a:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+    /* ══════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════ */
+    .hero {
+      margin-top: var(--nav-h);
+      background: linear-gradient(135deg, var(--ink) 0%, #2a3f52 55%, var(--green) 100%);
+      padding: 5rem 1.5rem 4.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: '✦';
+      position: absolute;
+      font-size: 18rem;
+      color: rgba(255,255,255,.03);
+      bottom: -3rem; right: -2rem;
+      font-family: serif;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-family: var(--font-ui);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      border: 1px solid var(--gold);
+      padding: .3rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      color: #fff;
+      line-height: 1.2;
+      max-width: 700px;
+      margin: 0 auto .6rem;
+      font-style: italic;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--gold-lt);
+    }
+
+    .hero-sub {
+      font-family: var(--font-ui);
+      color: rgba(255,255,255,.6);
+      font-size: .9rem;
+      letter-spacing: .06em;
+      margin-top: .5rem;
+    }
+
+    .hero-divider {
+      margin: 2.5rem auto 0;
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    /* ══════════════════════════════════════════
+       LAYOUT PRINCIPAL
+    ══════════════════════════════════════════ */
+    main {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 3rem 1.5rem 5rem;
+    }
+
+    /* ══════════════════════════════════════════
+       SECCIONES
+    ══════════════════════════════════════════ */
+    .section {
+      margin-bottom: 4.5rem;
+      scroll-margin-top: calc(var(--nav-h) + 1.5rem);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+      margin-bottom: 1.8rem;
+      padding-bottom: 1.2rem;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .section-num {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      font-family: var(--font-head);
+      font-size: 1.1rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(42,92,69,.35);
+    }
+
+    .section-title-wrap {}
+    .section-label {
+      font-family: var(--font-ui);
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+      margin-bottom: .2rem;
+    }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      color: var(--ink);
+      line-height: 1.25;
+    }
+    .section-desc {
+      font-family: var(--font-ui);
+      font-size: .85rem;
+      color: #687a87;
+      margin-top: .4rem;
+      line-height: 1.55;
+    }
+
+    /* ══════════════════════════════════════════
+       CARD BASE
+    ══════════════════════════════════════════ */
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.6rem;
+      box-shadow: 0 2px 16px var(--shadow);
+    }
+
+    .card-title {
+      font-family: var(--font-ui);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: .8rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 14px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .card h3 {
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: .6rem;
+    }
+
+    /* ══════════════════════════════════════════
+       PLACEHOLDER DE EVIDENCIAS
+    ══════════════════════════════════════════ */
+    .placeholder {
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+      padding: 1.6rem 1.2rem;
+      text-align: center;
+      background: var(--cream);
+      position: relative;
+      transition: border-color .2s;
+    }
+    .placeholder:hover { border-color: var(--sage); }
+
+    .placeholder-icon {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: .6rem;
+      opacity: .55;
+    }
+
+    .placeholder p {
+      font-family: var(--font-ui);
+      font-size: .8rem;
+      color: #9aabb3;
+      line-height: 1.5;
+    }
+    .placeholder p strong {
+      display: block;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #b2bfc6;
+      margin-bottom: .3rem;
+    }
+
+    .placeholder-tag {
+      display: inline-block;
+      font-family: var(--font-ui);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .2rem .7rem;
+      border-radius: 100px;
+      margin-top: .8rem;
+      background: var(--mist);
+      color: var(--green);
+      border: 1px solid var(--sage);
+    }
+
+    /* ══════════════════════════════════════════
+       GRIDS
+    ══════════════════════════════════════════ */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; }
+
+    /* ══════════════════════════════════════════
+       §1 — PRESENTACIÓN
+    ══════════════════════════════════════════ */
+    .profile-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.6rem;
+      box-shadow: 0 2px 16px var(--shadow);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.8rem;
+      align-items: start;
+    }
+
+    .avatar-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .8rem;
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--mist), var(--cream-dark));
+      border: 3px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.8rem;
+      box-shadow: 0 4px 18px var(--shadow);
+    }
+
+    .avatar-label {
+      font-family: var(--font-ui);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #9aabb3;
+    }
+
+    .profile-fields { display: flex; flex-direction: column; gap: .9rem; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+    }
+    .field label {
+      font-family: var(--font-ui);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .field-box {
+      padding: .55rem .8rem;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      color: #7a8e9a;
+      font-style: italic;
+      background: var(--cream);
+      min-height: 38px;
+    }
+
+    .field-box.tall { min-height: 80px; }
+
+    /* ══════════════════════════════════════════
+       §2 — OBJETIVOS
+    ══════════════════════════════════════════ */
+    .objetivos-list {
+      display: flex;
+      flex-direction: column;
+      gap: .85rem;
+    }
+
+    .objetivo-item {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--green);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: .9rem 1.2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      box-shadow: 0 1px 8px var(--shadow);
+    }
+
+    .obj-num {
+      font-family: var(--font-head);
+      font-size: 1.4rem;
+      color: var(--green);
+      line-height: 1;
+      flex-shrink: 0;
+      opacity: .45;
+    }
+
+    .obj-content {}
+    .obj-content h4 {
+      font-family: var(--font-ui);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .25rem;
+    }
+    .obj-content .field-box { background: var(--cream); }
+
+    /* ══════════════════════════════════════════
+       §3 — MOTIVACIÓN
+    ══════════════════════════════════════════ */
+    .lluvia-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.6rem;
+      box-shadow: 0 2px 16px var(--shadow);
+    }
+
+    .tags-area {
+      display: flex; flex-wrap: wrap; gap: .55rem;
+      min-height: 90px;
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+      padding: .8rem;
+      background: var(--cream);
+      margin-top: .8rem;
+    }
+
+    .tag-sample {
+      font-family: var(--font-ui);
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .3rem .85rem;
+      border-radius: 100px;
+      background: var(--mist);
+      color: var(--green);
+      border: 1px solid var(--sage);
+      cursor: default;
+    }
+    .tag-placeholder {
+      font-family: var(--font-ui);
+      font-size: .75rem;
+      color: #b2bfc6;
+      font-style: italic;
+      padding: .3rem .5rem;
+    }
+
+    .personaje-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1.2rem;
+    }
+
+    .personaje-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem 1rem;
+      text-align: center;
+      box-shadow: 0 2px 10px var(--shadow);
+    }
+
+    .personaje-icon { font-size: 2rem; display: block; margin-bottom: .5rem; }
+    .personaje-card h4 {
+      font-family: var(--font-ui);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .5rem;
+    }
+    .personaje-card .field-box { font-size: .82rem; min-height: 60px; }
+
+    /* ══════════════════════════════════════════
+       §4 — PLANIFICACIÓN
+    ══════════════════════════════════════════ */
+    .estructura-tabla {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 2px 12px var(--shadow);
+    }
+
+    .estructura-tabla th {
+      background: var(--ink);
+      color: rgba(255,255,255,.85);
+      font-family: var(--font-ui);
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: .75rem 1rem;
+      text-align: left;
+    }
+
+    .estructura-tabla td {
+      background: #fff;
+      padding: .75rem 1rem;
+      border-top: 1px solid var(--cream-dark);
+      font-family: var(--font-body);
+      font-size: .88rem;
+      color: #7a8e9a;
+      font-style: italic;
+      vertical-align: top;
+    }
+
+    .estructura-tabla tr:last-child td:first-child { border-bottom-left-radius: var(--radius); }
+    .estructura-tabla tr:last-child td:last-child { border-bottom-right-radius: var(--radius); }
+
+    .parte-badge {
+      display: inline-block;
+      font-family: var(--font-ui);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .2rem .7rem;
+      border-radius: 100px;
+    }
+    .badge-inicio { background: #dce8e1; color: var(--green); }
+    .badge-nudo { background: #fdf0d5; color: #8a5f00; }
+    .badge-desenlace { background: #fde8e8; color: #8a2020; }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 1.2rem;
+      position: relative;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 20px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--green), var(--sage), transparent);
+    }
+
+    .tl-item {
+      display: flex;
+      gap: 1.2rem;
+      align-items: flex-start;
+      padding: .8rem 0;
+      position: relative;
+    }
+
+    .tl-dot {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: #fff;
+      font-family: var(--font-ui);
+      font-size: .7rem;
+      font-weight: 700;
+      border: 3px solid var(--cream);
+      box-shadow: 0 0 0 2px var(--green);
+      z-index: 1;
+    }
+
+    .tl-content {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .9rem 1.1rem;
+      box-shadow: 0 1px 8px var(--shadow);
+    }
+
+    .tl-content h4 {
+      font-family: var(--font-ui);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .3rem;
+    }
+    .tl-content .field-box { margin-top: .4rem; }
+
+    /* ══════════════════════════════════════════
+       §5 — PRODUCCIÓN
+    ══════════════════════════════════════════ */
+    .evolucion-track {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .evolucion-step {
+      flex: 1;
+      text-align: center;
+    }
+
+    .ev-line {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--green), var(--gold));
+      margin: 1.2rem 0;
+      position: relative;
+    }
+    .ev-arrow {
+      position: absolute;
+      right: -6px; top: -5px;
+      width: 0; height: 0;
+      border-left: 8px solid var(--gold);
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+    }
+
+    .ev-badge {
+      font-family: var(--font-ui);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .2rem .7rem;
+      border-radius: 100px;
+      display: inline-block;
+      margin-bottom: .6rem;
+    }
+    .ev-badge.v1 { background: #f0e9d5; color: #7a5f00; }
+    .ev-badge.v2 { background: #e2f0e8; color: #2a5c45; }
+    .ev-badge.v3 { background: var(--ink); color: var(--gold-lt); }
+
+    /* ══════════════════════════════════════════
+       §6 — REVISIÓN
+    ══════════════════════════════════════════ */
+    .nota-docente {
+      background: #fff8ec;
+      border: 1px solid #e8c97a;
+      border-left: 4px solid var(--gold);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1.2rem 1.4rem;
+    }
+    .nota-docente .nd-label {
+      font-family: var(--font-ui);
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .5rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .nota-docente .nd-label::before {
+      content: '✏️';
+      font-size: .9rem;
+    }
+    .nota-docente .field-box { background: #fffdf5; min-height: 90px; }
+
+    .cambio-list {
+      display: flex;
+      flex-direction: column;
+      gap: .7rem;
+      margin-top: 1rem;
+    }
+    .cambio-item {
+      display: flex;
+      gap: 1rem;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .9rem 1.1rem;
+      box-shadow: 0 1px 6px var(--shadow);
+    }
+    .cambio-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .cambio-desc { font-family: var(--font-ui); font-size: .8rem; color: #7a8e9a; font-style: italic; }
+    .cambio-desc strong { display: block; font-style: normal; color: var(--ink); font-size: .78rem; margin-bottom: .2rem; }
+
+    /* ══════════════════════════════════════════
+       §7 — REFLEXIÓN
+    ══════════════════════════════════════════ */
+    .reflexion-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    .reflexion-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      box-shadow: 0 2px 12px var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .reflexion-card::before {
+      content: attr(data-icon);
+      position: absolute;
+      right: 1rem; top: .8rem;
+      font-size: 2rem;
+      opacity: .12;
+    }
+
+    .reflexion-card .rq {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--ink);
+      margin-bottom: .8rem;
+      line-height: 1.4;
+    }
+
+    .reflexion-card .field-box { min-height: 90px; }
+
+    .reflexion-card.destaca {
+      border-color: var(--sage);
+      border-left: 4px solid var(--green);
+    }
+
+    /* ══════════════════════════════════════════
+       §8 — PRODUCTO FINAL
+    ══════════════════════════════════════════ */
+    .producto-final-wrap {
+      background: linear-gradient(135deg, var(--ink) 0%, #2a3f52 100%);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 2.5rem;
+      box-shadow: 0 8px 40px rgba(28,43,58,.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .producto-final-wrap::before {
+      content: '📖';
+      position: absolute;
+      font-size: 10rem;
+      right: -1rem; bottom: -1rem;
+      opacity: .06;
+      pointer-events: none;
+    }
+
+    .pf-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .pf-badge {
+      font-family: var(--font-ui);
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      padding: .35rem 1rem;
+      border-radius: 100px;
+      background: var(--gold);
+      color: var(--ink);
+    }
+
+    .pf-header h3 {
+      font-family: var(--font-head);
+      font-style: italic;
+      color: rgba(255,255,255,.75);
+      font-size: .95rem;
+    }
+
+    .pf-titulo-area {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .pf-titulo-area .field-box {
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.2);
+      color: rgba(255,255,255,.6);
+      font-size: 1.1rem;
+      text-align: center;
+      min-height: 50px;
+      border-radius: 8px;
+      max-width: 480px;
+      margin: 0 auto;
+      font-family: var(--font-head);
+    }
+
+    .pf-label-small {
+      font-family: var(--font-ui);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      margin-bottom: .5rem;
+      display: block;
+    }
+
+    .pf-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    .pf-preview .placeholder {
+      background: rgba(255,255,255,.05);
+      border-color: rgba(255,255,255,.15);
+    }
+
+    .pf-preview .placeholder p { color: rgba(255,255,255,.4); }
+    .pf-preview .placeholder p strong { color: rgba(255,255,255,.3); }
+
+    /* ══════════════════════════════════════════
+       §9 — COEVALUACIÓN
+    ══════════════════════════════════════════ */
+    .rubrica-wrap {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 2px 14px var(--shadow);
+    }
+
+    .rubrica-header {
+      background: var(--ink);
+      padding: .8rem 1.2rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: .5rem;
+    }
+
+    .rubrica-header span {
+      font-family: var(--font-ui);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.75);
+    }
+
+    .rubrica-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: .5rem;
+      padding: .8rem 1.2rem;
+      border-top: 1px solid var(--cream-dark);
+      align-items: center;
+    }
+
+    .rubrica-row:nth-child(even) { background: #fafaf8; }
+
+    .rubrica-row .criterio {
+      font-family: var(--font-body);
+      font-size: .85rem;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .rubrica-row .criterio small {
+      display: block;
+      font-size: .75rem;
+      color: #8a9aa5;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .score-circle {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-ui);
+      font-size: .8rem;
+      font-weight: 700;
+      color: #b2bfc6;
+      background: var(--cream);
+      cursor: pointer;
+      transition: all .2s;
+      margin: 0 auto;
+    }
+    .score-circle:hover { border-color: var(--green); color: var(--green); }
+    .score-circle.selected { background: var(--green); border-color: var(--green); color: #fff; }
+
+    .nota-comp {
+      background: var(--cream);
+      border-top: 1px solid var(--border);
+      padding: 1rem 1.2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .nota-comp .field { }
+    .nota-comp .field label {
+      font-family: var(--font-ui);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--green);
+      display: block;
+      margin-bottom: .35rem;
+    }
+    .nota-comp .field-box { background: #fff; min-height: 70px; }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    footer {
+      background: var(--ink);
+      color: rgba(255,255,255,.45);
+      text-align: center;
+      padding: 2rem 1.5rem;
+      font-family: var(--font-ui);
+      font-size: .75rem;
+      letter-spacing: .05em;
+    }
+
+    footer strong { color: rgba(255,255,255,.7); }
+
+    .footer-divider {
+      width: 40px; height: 1px;
+      background: rgba(255,255,255,.2);
+      margin: .8rem auto;
+    }
+
+    /* ══════════════════════════════════════════
+       PROGRESS BAR
+    ══════════════════════════════════════════ */
+    #progress-bar {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--green), var(--gold));
+      width: 0%;
+      z-index: 1001;
+      transition: width .1s linear;
+    }
+
+    /* ══════════════════════════════════════════
+       BACK TO TOP
+    ══════════════════════════════════════════ */
+    #back-top {
+      position: fixed;
+      bottom: 2rem; right: 2rem;
+      width: 42px; height: 42px;
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s, transform .3s;
+      box-shadow: 0 4px 18px rgba(28,43,58,.4);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 990;
+    }
+    #back-top.visible { opacity: 1; pointer-events: all; }
+    #back-top:hover { transform: translateY(-3px); }
+
+    /* ══════════════════════════════════════════
+       ANIMACIONES ENTRADA
+    ══════════════════════════════════════════ */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media (max-width: 720px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      .nav-inner { justify-content: space-between; }
+
+      .profile-card { grid-template-columns: 1fr; }
+      .avatar-wrap { flex-direction: row; justify-content: flex-start; }
+      .field-row { grid-template-columns: 1fr; }
+
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .personaje-grid { grid-template-columns: 1fr 1fr; }
+
+      .rubrica-header,
+      .rubrica-row { grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr; }
+
+      .nota-comp { grid-template-columns: 1fr; }
+
+      .reflexion-cards { grid-template-columns: 1fr; }
+
+      .pf-preview { grid-template-columns: 1fr; }
+
+      .hero h1 { font-size: 1.8rem; }
+    }
+
+    @media (max-width: 480px) {
+      .personaje-grid { grid-template-columns: 1fr; }
+      .rubrica-header span:nth-child(n+3) { display: none; }
+      .rubrica-row > *:nth-child(n+3) { display: none; }
+      .rubrica-header,
+      .rubrica-row { grid-template-columns: 2fr 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════ BARRA DE PROGRESO ════════════ -->
+<div id="progress-bar"></div>
+
+<!-- ════════════ NAVEGACIÓN ════════════ -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <span class="nav-brand">✦ Cuento Digital · 5º Primaria</span>
+    <div class="nav-sep"></div>
+    <div class="nav-links">
+      <a href="#sec1">Presentación</a>
+      <a href="#sec2">Objetivos</a>
+      <a href="#sec3">Motivación</a>
+      <a href="#sec4">Planificación</a>
+      <a href="#sec5">Producción</a>
+      <a href="#sec6">Revisión</a>
+      <a href="#sec7">Reflexión</a>
+      <a href="#sec8">Producto Final</a>
+      <a href="#sec9">Coevaluación</a>
+    </div>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Drawer móvil -->
+<div class="nav-drawer" id="nav-drawer">
+  <a href="#sec1" onclick="closeDrawer()">1 · Presentación</a>
+  <a href="#sec2" onclick="closeDrawer()">2 · Objetivos de aprendizaje</a>
+  <a href="#sec3" onclick="closeDrawer()">3 · Motivación e ideas iniciales</a>
+  <a href="#sec4" onclick="closeDrawer()">4 · Planificación del cuento</a>
+  <a href="#sec5" onclick="closeDrawer()">5 · Producción escrita</a>
+  <a href="#sec6" onclick="closeDrawer()">6 · Revisión y mejora</a>
+  <a href="#sec7" onclick="closeDrawer()">7 · Reflexión personal</a>
+  <a href="#sec8" onclick="closeDrawer()">8 · Producto final</a>
+  <a href="#sec9" onclick="closeDrawer()">9 · Coevaluación</a>
+</div>
+
+<!-- ════════════ HERO ════════════ -->
+<header class="hero">
+  <div class="hero-badge">E-Portafolio · Lengua Castellana y Literatura</div>
+  <h1>Creamos nuestro propio<br><em>cuento digital</em></h1>
+  <p class="hero-sub">Situación de Aprendizaje · 5.º de Educación Primaria · Curso 2024–2025</p>
+  <div class="hero-divider"></div>
+</header>
+
+<!-- ════════════ MAIN ════════════ -->
+<main>
+
+  <!-- ─────────────────────────────────────────
+       §1 PRESENTACIÓN
+  ───────────────────────────────────────── -->
+  <section class="section fade-in" id="sec1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title-wrap">
+        <span class="section-label">Punto de partida</span>
+        <h2 class="section-title">Presentación del estudiantado</h2>
+        <p class="section-desc">Espacio para la información básica del alumno o alumna, su perfil como lector/escritor y sus expectativas ante esta situación de aprendizaje.</p>
+      </div>
+    </div>
+
+    <div class="profile-card">
+      <div class="avatar-wrap">
+        <div class="avatar">🧒</div>
+        <span class="avatar-label">Foto del alumno/a</span>
+      </div>
+      <div class="profile-fields">
+        <div class="field-row">
+          <div class="field">
+            <label>Nombre completo</label>
+            <div class="field-box">Nombre y apellidos del alumno/a</div>
+          </div>
+          <div class="field">
+            <label>Curso y grupo</label>
+            <div class="field-box">5.º de Educación Primaria · Grupo ___</div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Centro educativo</label>
+            <div class="field-box">Nombre del centro</div>
+          </div>
+          <div class="field">
+            <label>Curso académico</label>
+            <div class="field-box">2024 – 2025</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Mi perfil como lector/escritor — ¿Cómo me describiría?</label>
+          <div class="field-box tall">El alumno/a describe brevemente su relación con la lectura y la escritura, sus gustos literarios y sus fortalezas y debilidades como escritor/a...</div>
+        </div>
+        <div class="field">
+          <label>Mis expectativas ante esta situación de aprendizaje</label>
+          <div class="field-box tall">¿Qué espero aprender? ¿Qué me motiva de este proyecto? ¿Qué me preocupa o me resulta difícil?...</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────
+       §2 OBJETIVOS
+  ───────────────────────────────────────── -->
+  <section class="section fade-in" id="sec2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title-wrap">
+        <span class="section-label">Metas de aprendizaje</span>
+        <h2 class="section-title">Objetivos de aprendizaje</h2>
+        <p class="section-desc">Recoge las competencias, saberes básicos y criterios de evaluación que guiarán el proceso de creación del cuento digital.</p>
+      </div>
+    </div>
+
+    <div class="objetivos-list">
+      <div class="objetivo-item">
+        <div class="obj-num">01</div>
+        <div class="obj-content">
+          <h4>Comunicación escrita</h4>
+          <div class="field-box">Planificar, redactar y revisar textos narrativos breves con coherencia, cohesión y adecuación, atendiendo a la estructura del cuento (inicio, nudo y desenlace).</div>
+        </div>
+      </div>
+      <div class="objetivo-item">
+        <div class="obj-num">02</div>
+        <div class="obj-content">
+          <h4>Recursos literarios</h4>
+          <div class="field-box">Identificar y aplicar elementos narrativos básicos: personajes, tiempo, espacio, narrador y recursos estilísticos propios del género.</div>
+        </div>
+      </div>
+      <div class="objetivo-item">
+        <div class="obj-num">03</div>
+        <div class="obj-content">
+          <h4>Revisión y mejora</h4>
+          <div class="field-box">Revisar y mejorar producciones propias y ajenas utilizando estrategias de autocorrección, el uso del diccionario y la retroalimentación del docente.</div>
+        </div>
+      </div>
+      <div class="objetivo-item">
+        <div class="obj-num">04</div>
+        <div class="obj-content">
+          <h4>Competencia digital</h4>
+          <div class="field-box">Utilizar herramientas digitales de forma responsable para producir, maquetar y difundir el cuento de manera creativa.</div>
+        </div>
+      </div>
+      <div class="objetivo-item card" style="border-left:none; border-color:var(--border); border-radius:var(--radius);">
+        <div class="obj-num" style="background:var(--gold);">✦</div>
+        <div class="obj-content" style="flex:1;">
+          <h4>Mi objetivo personal</h4>
+          <div class="field-box tall">El alumno/a escribe su propio objetivo: ¿Qué quiero conseguir con este proyecto? ¿En qué aspecto quiero mejorar especialmente?...</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────
+       §3 MOTIVACIÓN
+  ───────────────────────────────────────── -->
+  <section class="section fade-in" id="sec3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title-wrap">
+        <span class="section-label">Exploración inicial</span>
+        <h2 class="section-title">Motivación e ideas iniciales</h2>
+        <p class="section-desc">Espacio para recoger las primeras ideas, la lluvia de pensamientos y las propuestas de personajes y mundos imaginados.</p>
+      </div>
+    </div>
+
+    <!-- Lluvia de ideas -->
+    <div class="lluvia-card" style="margin-bottom:1.2rem;">
+      <div class="card-title">Lluvia de ideas — Temas y mundos posibles</div>
+      <p style="font-family:var(--font-ui);font-size:.82rem;color:#7a8e9a;margin-bottom:.5rem;">¿Sobre qué podría tratar nuestro cuento? Todas las ideas son bienvenidas. Se añaden como etiquetas:</p>
+      <div class="tags-area">
+        <span class="tag-sample">🐉 Dragones</span>
+        <span class="tag-sample">🌊 El océano perdido</span>
+        <span class="tag-sample">🚀 Viaje al futuro</span>
+        <span class="tag-sample">🏰 Un castillo encantado</span>
+        <span class="tag-placeholder">+ Añadir idea...</span>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:1.2rem;">
+      <div class="lluvia-card">
+        <div class="card-title">¿Qué tipo de cuento queremos?</div>
+        <div class="tags-area" style="min-height:70px;">
+          <span class="tag-sample">Aventura</span>
+          <span class="tag-sample">Fantasía</span>
+          <span class="tag-sample">Misterio</span>
+          <span class="tag-placeholder">+ Otro género...</span>
+        </div>
+      </div>
+      <div class="lluvia-card">
+        <div class="card-title">¿Dónde transcurrirá la historia?</div>
+        <div class="tags-area" style="min-height:70px;">
+          <span class="tag-sample">Un bosque mágico</span>
+          <span class="tag-sample">Ciudad futurista</span>
+          <span class="tag-placeholder">+ Lugar inventado...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Propuesta de personajes -->
+    <div class="card">
+      <div class="card-title">Propuesta de personajes</div>
+      <div class="personaje-grid">
+        <div class="personaje-card">
+          <span class="personaje-icon">🦸</span>
+          <h4>Protagonista</h4>
+          <div class="field-box">Nombre, descripción física y personalidad del personaje principal...</div>
+        </div>
+        <div class="personaje-card">
+          <span class="personaje-icon">🦹</span>
+          <h4>Antagonista</h4>
+          <div class="field-box">¿Quién o qué se opone al protagonista? ¿Cuáles son sus motivaciones?...</div>
+        </div>
+        <div class="personaje-card">
+          <span class="personaje-icon">🧙</span>
+          <h4>Personaje secundario</h4>
+          <div class="field-box">Un aliado, mentor o compañero que acompaña al protagonista...</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.2rem;">
+      <div class="placeholder">
+        <span class="placeholder-icon">🎨</span>
+        <p><strong>Evidencia gráfica</strong>Bocetos, dibujos o mapas conceptuales con las ideas iniciales del cuento (fotografía del papel o imagen digital)</p>
+        <span class="placeholder-tag">Imagen / Boceto</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────
+       §4 PLANIFICACIÓN
+  ───────────────────────────────────────── -->
+  <section class="section fade-in" id="sec4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title-wrap">
+        <span class="section-label">Organización y estructura</span>
+        <h2 class="section-title">Planificación del cuento</h2>
+        <p class="section-desc">Herramientas para estructurar la narrativa antes de escribir: esquema, guion y secuenciación de escenas.</p>
+      </div>
+    </div>
+
+    <!-- Tabla estructura -->
+    <div class="card" style="margin-bottom:1.2rem;">
+      <div class="card-title">Esquema narrativo</div>
+      <table class="estructura-tabla">
+        <thead>
+          <tr>
+            <th>Parte</th>
+            <th>¿Qué ocurre?</th>
+            <th>Personajes implicados</th>
+            <th>Escenario</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="parte-badge badge-inicio">Inicio</span></td>
+            <td>Se presenta el mundo, los personajes y la situación inicial que desencadena la historia...</td>
+            <td>Protagonista / Secundario</td>
+            <td>Descripción del lugar de inicio...</td>
+          </tr>
+          <tr>
+            <td><span class="parte-badge badge-nudo">Nudo</span></td>
+            <td>Surge el conflicto o problema principal. El protagonista debe enfrentarse a obstáculos...</td>
+            <td>Todos los personajes</td>
+            <td>Lugar donde se desarrolla el conflicto...</td>
+          </tr>
+          <tr>
+            <td><span class="parte-badge badge-desenlace">Desenlace</span></td>
+            <td>Se resuelve el conflicto. La historia llega a su fin de manera satisfactoria o inesperada...</td>
+            <td>Protagonista / Antagonista</td>
+            <td>Escenario final de la historia...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Timeline / secuenciación -->
+    <div class="card">
+      <div class="card-title">Secuenciación de escenas — Guion del cuento</div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot">E1</div>
+          <div class="tl-content">
+            <h4>Escena 1 · Presentación</h4>
+            <div class="field-box">Describe brevemente qué sucede en esta primera escena. ¿Dónde y cuándo empieza todo? ¿Qué hace el protagonista?...</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">E2</div>
+          <div class="tl-content">
+            <h4>Escena 2 · El problema</h4>
+            <div class="field-box">¿Qué ocurre para romper el equilibrio inicial? ¿Qué desencadena el conflicto?...</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">E3</div>
+          <div class="tl-content">
+            <h4>Escena 3 · Clímax</h4>
+            <div class="field-box">El momento de mayor tensión de la historia. ¿A qué se enfrenta el protagonista? ¿Cuál es el punto de inflexión?...</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">E4</div>
+          <div class="tl-content">
+            <h4>Escena 4 · Resolución y final</h4>
+            <div class="field-box">¿Cómo se resuelve el conflicto? ¿Qué aprenden o cómo cambian los personajes al final?...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.2rem;">
+      <div class="placeholder">
+        <span class="placeholder-icon">📋</span>
+        <p><strong>Guion manuscrito o digital</strong>Fotografía del guion en papel, documento escaneado o archivo de texto con la planificación detallada del cuento</p>
+        <span class="placeholder-tag">Documento / Fotografía</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────
+       §5 PRODUCCIÓN ESCRITA
+  ───────────────────────────────────────── -->
+  <section class="section fade-in" id="sec5">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title-wrap">
+        <span class="section-label">Del borrador al texto</span>
+        <h2 class="section-title">Producción escrita</h2>
+        <p class="section-desc">Evidencias del proceso de escritura: desde las primeras descripciones y caracterizaciones hasta el borrador completo del cuento.</p>
+      </div>
+    </div>
+
+    <!-- Descripción inicial -->
+    <div class="card" style="margin-bottom:1.4rem;">
+      <div class="card-title">Fase 1 — Descripción inicial de personajes y escenarios</div>
+      <div class="grid-2">
+        <div>
+          <h3 style="font-size:.9rem;margin-bottom:.6rem;">Descripción del protagonista</h3>
+          <div class="field-box tall">El alumno/a escribe aquí una descripción detallada de su personaje principal: aspecto físico, forma de ser, sueños, miedos, habilidades especiales...</div>
+        </div>
+        <div>
+          <h3 style="font-size:.9rem;margin-bottom:.6rem;">Descripción del escenario principal</h3>
+          <div class="field-box tall">Descripción del lugar donde transcurre la mayor parte de la historia: colores, sonidos, sensaciones, qué hace especial a ese lugar...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evolución de versiones -->
+    <div class="card">
+      <div class="card-title">Evidencias de escritura — Evolución del borrador</div>
+
+      <div class="grid-3" style="margin-bottom:1.2rem;">
+        <div style="text-align:center;">
+          <span class="ev-badge v1">Borrador 1</span>
+          <div class="placeholder" style="margin-top:.5rem; min-height:160px;">
+            <span class="placeholder-icon">📝</span>
+            <p><strong>Primera versión</strong>Fotografía del borrador manuscrito o archivo con el primer texto completo del cuento</p>
+            <span class="placeholder-tag">Evidencia escrita</span>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <span class="ev-badge v2">Borrador 2</span>
+          <div class="placeholder" style="margin-top:.5rem; min-height:160px;">
+            <span class="placeholder-icon">✍️</span>
+            <p><strong>Segunda versión</strong>Texto revisado tras las primeras correcciones y mejoras introducidas</p>
+            <span class="placeholder-tag">Evidencia escrita</span>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <span class="ev-badge v3">Versión final</span>
+          <div class="placeholder" style="margin-top:.5rem; min-height:160px;">
+            <span class="placeholder-icon">⭐</span>
+            <p><strong>Texto definitivo</strong>Versión pulida y lista para ser maquetada como cuento digital</p>
+            <span class="placeholder-tag">Versión final</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label style="font-family:var(--font-ui);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);">Reflexión sobre el proceso de escritura</label>
+        <div class="field-box tall">¿Qué ha sido lo más difícil de escribir? ¿Qué cambios has introducido entre la primera y la última versión? ¿Por qué?...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────
+       §6 REVISIÓN Y MEJORA
+  ───────────────────────────────────────── -->
+  <section class="section fade-in" id="sec6">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div class="section-title-wrap">
+        <span class="section-label">Corrección y progreso</span>
+        <h2 class="section-title">Revisión y mejora</h2>
+        <p class="section-desc">Espacio para documentar las correcciones, la retroalimentación del docente y los cambios concretos introducidos en el texto.</p>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:1.2rem;">
+      <div class="nota-docente">
+        <div class="nd-label">Comentarios del docente — 1.ª revisión</div>
+        <div class="field-box" style="background:#fffdf5; min-height:100px; border-color:#e8c97a;">Espacio reservado para la retroalimentación escrita del profesor o profesora sobre el primer borrador. Se incluirán aspectos positivos, sugerencias de mejora y puntos a corregir...</div>
+        <div style="margin-top:.7rem; font-family:var(--font-ui); font-size:.7rem; color:#b2a070;">Fecha de revisión: ___/___/______</div>
+      </div>
+      <div class="nota-docente" style="background:#f5faff; border-color:#7ab5e8; border-left-color:#2a5c8c;">
+        <div class="nd-label" style="color:#2a5c8c;">
+          <span>💬</span> Comentarios del docente — 2.ª revisión
+        </div>
+        <div class="field-box" style="background:#f8fcff; min-height:100px; border-color:#aed0f0;">Segunda ronda de retroalimentación tras la entrega del segundo borrador. Se valoran las mejoras realizadas y se señalan los aspectos que aún pueden perfeccionarse...</div>
+        <div style="margin-top:.7rem; font-family:var(--font-ui); font-size:.7rem; color:#6899c0;">Fecha de revisión: ___/___/______</div>
+      </div>
+    </div>
+
+    <!-- Checklist de autocorrección -->
+    <div class="card" style="margin-bottom:1.2rem;">
+      <div class="card-title">Lista de control — Autocorrección del alumno/a</div>
+      <div class="cambio-list">
+        <div class="cambio-item">
+          <span class="cambio-icon">🔤</span>
+          <div class="cambio-desc">
+            <strong>Ortografía y puntuación</strong>
+            He revisado las tildes, los signos de puntuación y la ortografía de las palabras que dudaba...
+          </div>
+        </div>
+        <div class="cambio-item">
+          <span class="cambio-icon">🔗</span>
+          <div class="cambio-desc">
+            <strong>Cohesión y conectores</strong>
+            He comprobado que los párrafos estén bien enlazados con conectores variados (sin repetir "entonces" o "y")...
+          </div>
+        </div>
+        <div class="cambio-item">
+          <span class="cambio-icon">📐</span>
+          <div class="cambio-desc">
+            <strong>Estructura narrativa</strong>
+            El cuento tiene inicio, nudo y desenlace claramente diferenciados y ordenados...
+          </div>
+        </div>
+        <div class="cambio-item">
+          <span class="cambio-icon">🎨</span>
+          <div class="cambio-desc">
+            <strong>Riqueza expresiva</strong>
+            He añadido adjetivos, comparaciones u otras figuras literarias para hacer el texto más vivo y original...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cambios introducidos -->
+    <div class="card">
+      <div class="card-title">Cambios más importantes que he introducido</div>
+      <div class="field-box tall">El alumno/a describe con sus propias palabras cuáles han sido las mejoras más significativas entre la versión inicial y la versión revisada. ¿Qué ha cambiado y por qué?...</div>
+
+      <div style="margin-top:1rem;">
+        <div class="placeholder">
+          <span class="placeholder-icon">📄</span>
+          <p><strong>Evidencia: texto con anotaciones</strong>Documento o fotografía del borrador con las correcciones marcadas (tachones, flechas, notas al margen)</p>
+          <span class="placeholder-tag">Documento corregido</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────
+       §7 REFLEXIÓN PERSONAL
+  ───────────────────────────────────────── -->
+  <section class="section fade-in" id="sec7">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div class="section-title-wrap">
+        <span class="section-label">Metacognición</span>
+        <h2 class="section-title">Reflexión personal</h2>
+        <p class="section-desc">Espacio para que el alumno o alumna tome conciencia de su propio aprendizaje, sus logros y sus áreas de mejora.</p>
+      </div>
+    </div>
+
+    <div class="reflexion-cards">
+      <div class="reflexion-card destaca" data-icon="💡">
+        <p class="rq">¿Qué he aprendido a lo largo de este proyecto?</p>
+        <div class="field-box" style="min-height:110px;">Reflexión libre del alumno/a sobre los aprendizajes más importantes: de lengua, de escritura, de trabajo en equipo, de uso de herramientas digitales...</div>
+      </div>
+      <div class="reflexion-card" data-icon="🌱">
+        <p class="rq">¿Qué necesito seguir mejorando?</p>
+        <div class="field-box" style="min-height:110px;">Aspectos concretos del proceso de escritura o del trabajo en los que el alumno/a reconoce que todavía tiene margen de mejora...</div>
+      </div>
+      <div class="reflexion-card" data-icon="⭐">
+        <p class="rq">¿De qué estoy más orgulloso/a en este trabajo?</p>
+        <div class="field-box" style="min-height:110px;">El alumno/a identifica el momento, la frase, la escena o el logro del que se siente más satisfecho/a y explica el motivo...</div>
+      </div>
+      <div class="reflexion-card" data-icon="🤔">
+        <p class="rq">¿Qué cambiaría si volviera a empezar?</p>
+        <div class="field-box" style="min-height:110px;">¿Qué haría de manera diferente? ¿Qué errores evitaría? ¿Qué estrategias nuevas utilizaría?...</div>
+      </div>
+    </div>
+
+    <!-- Escala de valoración personal -->
+    <div class="card" style="margin-top:1.2rem;">
+      <div class="card-title">Mi valoración del esfuerzo y la dedicación</div>
+      <p style="font-family:var(--font-ui);font-size:.82rem;color:#7a8e9a;margin-bottom:1rem;">El alumno/a marca, de forma honesta, cómo valora su implicación en cada fase del proyecto:</p>
+      <div style="display:flex;flex-direction:column;gap:.7rem;">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;padding:.6rem .9rem;background:var(--cream);border-radius:8px;border:1px solid var(--border);">
+          <span style="font-family:var(--font-body);font-size:.88rem;">Planificación y organización del cuento</span>
+          <div style="display:flex;gap:.35rem;">
+            <div class="score-circle" onclick="toggleScore(this)">1</div>
+            <div class="score-circle" onclick="toggleScore(this)">2</div>
+            <div class="score-circle" onclick="toggleScore(this)">3</div>
+            <div class="score-circle" onclick="toggleScore(this)">4</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;padding:.6rem .9rem;background:var(--cream);border-radius:8px;border:1px solid var(--border);">
+          <span style="font-family:var(--font-body);font-size:.88rem;">Esfuerzo y dedicación en la escritura</span>
+          <div style="display:flex;gap:.35rem;">
+            <div class="score-circle" onclick="toggleScore(this)">1</div>
+            <div class="score-circle" onclick="toggleScore(this)">2</div>
+            <div class="score-circle" onclick="toggleScore(this)">3</div>
+            <div class="score-circle" onclick="toggleScore(this)">4</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;padding:.6rem .9rem;background:var(--cream);border-radius:8px;border:1px solid var(--border);">
+          <span style="font-family:var(--font-body);font-size:.88rem;">Apertura a la retroalimentación recibida</span>
+          <div style="display:flex;gap:.35rem;">
+            <div class="score-circle" onclick="toggleScore(this)">1</div>
+            <div class="score-circle" onclick="toggleScore(this)">2</div>
+            <div class="score-circle" onclick="toggleScore(this)">3</div>
+            <div class="score-circle" onclick="toggleScore(this)">4</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:.6rem;font-family:var(--font-ui);font-size:.68rem;color:#b2bfc6;text-align:right;">1 = Mejorable · 2 = Regular · 3 = Bien · 4 = Excelente</div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────
+       §8 PRODUCTO FINAL
+  ───────────────────────────────────────── -->
+  <section class="section fade-in" id="sec8">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div class="section-title-wrap">
+        <span class="section-label">Obra terminada</span>
+        <h2 class="section-title">Producto final</h2>
+        <p class="section-desc">Sección destacada para mostrar la versión definitiva del cuento digital: texto, ilustraciones y presentación final.</p>
+      </div>
+    </div>
+
+    <div class="producto-final-wrap">
+      <div class="pf-header">
+        <span class="pf-badge">✦ Cuento Digital</span>
+        <h3>Versión definitiva del alumno/a</h3>
+      </div>
+
+      <div class="pf-titulo-area">
+        <span class="pf-label-small">Título del cuento</span>
+        <div class="field-box" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.65);font-size:1.2rem;text-align:center;padding:.8rem;font-family:var(--font-head);font-style:italic;">
+          «El título del cuento del alumno/a»
+        </div>
+        <p style="font-family:var(--font-ui);font-size:.75rem;color:rgba(255,255,255,.4);margin-top:.5rem;">por Nombre Apellido · 5.º de Primaria · Curso 2024–2025</p>
+      </div>
+
+      <div class="pf-preview">
+        <div class="placeholder" style="min-height:200px;">
+          <span class="placeholder-icon" style="opacity:.5;">📱</span>
+          <p style="color:rgba(255,255,255,.45);"><strong style="color:rgba(255,255,255,.3);">Presentación digital</strong>Enlace, captura o incrustación de la presentación del cuento (Canva, Book Creator, Google Slides, etc.)</p>
+          <span class="placeholder-tag" style="background:rgba(255,255,255,.08);color:var(--gold-lt);border-color:rgba(255,255,255,.2);">Enlace / Embed</span>
+        </div>
+        <div class="placeholder" style="min-height:200px;">
+          <span class="placeholder-icon" style="opacity:.5;">🖼️</span>
+          <p style="color:rgba(255,255,255,.45);"><strong style="color:rgba(255,255,255,.3);">Ilustraciones del cuento</strong>Imágenes, dibujos o ilustraciones digitales creadas para acompañar el texto definitivo</p>
+          <span class="placeholder-tag" style="background:rgba(255,255,255,.08);color:var(--gold-lt);border-color:rgba(255,255,255,.2);">Imagen / Galería</span>
+        </div>
+      </div>
+
+      <div style="margin-top:1.4rem;">
+        <span class="pf-label-small">Nota del autor/a — Presentación del cuento</span>
+        <div class="field-box" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.55);min-height:90px;">El alumno/a escribe una breve presentación de su cuento para el lector: de qué trata, por qué lo eligió, qué le gustaría que el lector sintiera al leerlo...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────
+       §9 COEVALUACIÓN
+  ───────────────────────────────────────── -->
+  <section class="section fade-in" id="sec9">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <div class="section-title-wrap">
+        <span class="section-label">Evaluación compartida</span>
+        <h2 class="section-title">Coevaluación y retroalimentación</h2>
+        <p class="section-desc">Rúbrica de valoración entre iguales sobre la calidad del cuento y la implicación demostrada durante el proceso.</p>
+      </div>
+    </div>
+
+    <div class="rubrica-wrap">
+      <div class="rubrica-header">
+        <span>Criterio de evaluación</span>
+        <span style="text-align:center;">1 — Inicio</span>
+        <span style="text-align:center;">2 — En proceso</span>
+        <span style="text-align:center;">3 — Logrado</span>
+        <span style="text-align:center;">4 — Excelente</span>
+      </div>
+      <div class="rubrica-row">
+        <div class="criterio">Estructura narrativa<small>Inicio, nudo y desenlace diferenciados</small></div>
+        <div class="score-circle" onclick="toggleScore(this)">1</div>
+        <div class="score-circle" onclick="toggleScore(this)">2</div>
+        <div class="score-circle" onclick="toggleScore(this)">3</div>
+        <div class="score-circle" onclick="toggleScore(this)">4</div>
+      </div>
+      <div class="rubrica-row">
+        <div class="criterio">Creatividad e originalidad<small>Ideas propias, personajes y mundos imaginativos</small></div>
+        <div class="score-circle" onclick="toggleScore(this)">1</div>
+        <div class="score-circle" onclick="toggleScore(this)">2</div>
+        <div class="score-circle" onclick="toggleScore(this)">3</div>
+        <div class="score-circle" onclick="toggleScore(this)">4</div>
+      </div>
+      <div class="rubrica-row">
+        <div class="criterio">Cohesión y coherencia<small>Texto ordenado, fluido y bien enlazado</small></div>
+        <div class="score-circle" onclick="toggleScore(this)">1</div>
+        <div class="score-circle" onclick="toggleScore(this)">2</div>
+        <div class="score-circle" onclick="toggleScore(this)">3</div>
+        <div class="score-circle" onclick="toggleScore(this)">4</div>
+      </div>
+      <div class="rubrica-row">
+        <div class="criterio">Corrección ortográfica<small>Tildes, puntuación y ortografía</small></div>
+        <div class="score-circle" onclick="toggleScore(this)">1</div>
+        <div class="score-circle" onclick="toggleScore(this)">2</div>
+        <div class="score-circle" onclick="toggleScore(this)">3</div>
+        <div class="score-circle" onclick="toggleScore(this)">4</div>
+      </div>
+      <div class="rubrica-row">
+        <div class="criterio">Riqueza léxica y expresiva<small>Variedad de palabras y recursos literarios</small></div>
+        <div class="score-circle" onclick="toggleScore(this)">1</div>
+        <div class="score-circle" onclick="toggleScore(this)">2</div>
+        <div class="score-circle" onclick="toggleScore(this)">3</div>
+        <div class="score-circle" onclick="toggleScore(this)">4</div>
+      </div>
+      <div class="rubrica-row">
+        <div class="criterio">Presentación y formato digital<small>Diseño cuidado, legible y atractivo</small></div>
+        <div class="score-circle" onclick="toggleScore(this)">1</div>
+        <div class="score-circle" onclick="toggleScore(this)">2</div>
+        <div class="score-circle" onclick="toggleScore(this)">3</div>
+        <div class="score-circle" onclick="toggleScore(this)">4</div>
+      </div>
+      <div class="rubrica-row">
+        <div class="criterio">Implicación y esfuerzo<small>Dedicación al proceso y superación</small></div>
+        <div class="score-circle" onclick="toggleScore(this)">1</div>
+        <div class="score-circle" onclick="toggleScore(this)">2</div>
+        <div class="score-circle" onclick="toggleScore(this)">3</div>
+        <div class="score-circle" onclick="toggleScore(this)">4</div>
+      </div>
+
+      <div class="nota-comp">
+        <div class="field">
+          <label>Lo que más me ha gustado del cuento de mi compañero/a</label>
+          <div class="field-box">Comentario positivo y concreto sobre el trabajo evaluado: una escena, un personaje, el final, el título, las ilustraciones...</div>
+        </div>
+        <div class="field">
+          <label>Una sugerencia de mejora constructiva</label>
+          <div class="field-box">Una propuesta concreta y amable para mejorar algún aspecto: un cambio de vocabulario, añadir más descripción, revisar el final...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Autoevaluación final del docente -->
+    <div class="card" style="margin-top:1.2rem; border-left:4px solid var(--green);">
+      <div class="card-title">Valoración global del docente</div>
+      <div class="grid-2">
+        <div class="field">
+          <label style="font-family:var(--font-ui);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);">Comentario general</label>
+          <div class="field-box tall">Observaciones finales del docente sobre el proceso de aprendizaje del alumno/a, sus logros más significativos y las competencias desarrolladas a lo largo de la situación de aprendizaje...</div>
+        </div>
+        <div class="field">
+          <label style="font-family:var(--font-ui);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);">Propuestas para el futuro</label>
+          <div class="field-box tall">Aspectos en los que el alumno/a debe seguir trabajando en próximas situaciones de aprendizaje. Orientaciones para transferir lo aprendido a nuevos contextos...</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:2rem;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--cream-dark);">
+        <div class="field" style="text-align:right;">
+          <label style="font-family:var(--font-ui);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);">Fecha de cierre</label>
+          <div class="field-box" style="min-width:160px;">___/___/______</div>
+        </div>
+        <div class="field" style="text-align:right;">
+          <label style="font-family:var(--font-ui);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);">Calificación</label>
+          <div class="field-box" style="min-width:100px;text-align:center;font-weight:700;font-size:1.1rem;color:var(--ink);">___</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ════════════ FOOTER ════════════ -->
+<footer>
+  <div style="font-size:1.4rem;margin-bottom:.5rem;">✦</div>
+  <strong>E-Portafolio · Creamos nuestro propio cuento digital</strong>
+  <div class="footer-divider"></div>
+  <p>5.º de Educación Primaria · Área de Lengua Castellana y Literatura · Curso 2024–2025</p>
+  <p style="margin-top:.4rem;font-size:.7rem;opacity:.6;">Situación de Aprendizaje · Documento de seguimiento progresivo del aprendizaje</p>
+</footer>
+
+<!-- ════════════ BOTÓN VOLVER ARRIBA ════════════ -->
+<button id="back-top" aria-label="Volver al inicio" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ════════════ SCRIPTS ════════════ -->
+<script>
+  /* ─ Barra de progreso ─ */
+  const bar = document.getElementById('progress-bar');
+  function updateBar() {
+    const scrolled = window.scrollY;
+    const max = document.body.scrollHeight - window.innerHeight;
+    bar.style.width = (scrolled / max * 100) + '%';
+  }
+
+  /* ─ Botón volver arriba ─ */
+  const backTop = document.getElementById('back-top');
+  function updateBackTop() {
+    backTop.classList.toggle('visible', window.scrollY > 400);
+  }
+
+  /* ─ Nav activo ─ */
+  const sections = document.querySelectorAll('.section');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  function updateNav() {
+    let current = '';
+    const offset = 90;
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - offset) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+
+  window.addEventListener('scroll', () => {
+    updateBar();
+    updateBackTop();
+    updateNav();
+  }, { passive: true });
+
+  /* ─ Fade-in al hacer scroll ─ */
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  fadeEls.forEach(el => observer.observe(el));
+
+  /* ─ Hamburger ─ */
+  const toggle = document.getElementById('nav-toggle');
+  const drawer = document.getElementById('nav-drawer');
+  let drawerOpen = false;
+  toggle.addEventListener('click', () => {
+    drawerOpen = !drawerOpen;
+    drawer.classList.toggle('open', drawerOpen);
+    const spans = toggle.querySelectorAll('span');
+    if (drawerOpen) {
+      spans[0].style.transform = 'translateY(7px) rotate(45deg)';
+      spans[1].style.opacity = '0';
+      spans[2].style.transform = 'translateY(-7px) rotate(-45deg)';
+    } else {
+      spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+    }
+  });
+  function closeDrawer() {
+    drawerOpen = false;
+    drawer.classList.remove('open');
+    const spans = toggle.querySelectorAll('span');
+    spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+  }
+
+  /* ─ Score circles (rúbrica) ─ */
+  function toggleScore(el) {
+    const row = el.parentElement;
+    const circles = row.querySelectorAll('.score-circle');
+    const val = parseInt(el.textContent);
+    circles.forEach((c, i) => {
+      c.classList.toggle('selected', i < val);
+    });
+  }
+</script>
+</body>
+</html>
